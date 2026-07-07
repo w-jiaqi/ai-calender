@@ -119,6 +119,24 @@ function compareEvents(a: FlatEvent, b: FlatEvent): number {
   return kindOrder.indexOf(a.kind) - kindOrder.indexOf(b.kind);
 }
 
+function compareConferenceEvents(a: DeadlineEvent, b: DeadlineEvent): number {
+  if (!a.date && !b.date) return a.label.localeCompare(b.label);
+  if (!a.date) return 1;
+  if (!b.date) return -1;
+  const delta = parseDate(a.date).getTime() - parseDate(b.date).getTime();
+  if (delta !== 0) return delta;
+  return kindOrder.indexOf(a.kind) - kindOrder.indexOf(b.kind);
+}
+
+function primarySubmissionLabel(conference: Conference): string {
+  const primary = [...conference.events]
+    .filter((event) => event.kind === "abstract" || event.kind === "paper")
+    .sort(compareConferenceEvents)[0];
+
+  if (!primary) return "No submission date";
+  return `${kindLabels[primary.kind]} ${formatDate(primary.date)}`;
+}
+
 function daysUntil(date: string, today: Date): number {
   return Math.ceil((parseDate(date).getTime() - today.getTime()) / 86_400_000);
 }
@@ -314,6 +332,20 @@ function App() {
     setMonth((current) => new Date(current.getFullYear(), current.getMonth() + delta, 1));
   }
 
+  function selectConference(conferenceId: string) {
+    const conference = conferences.find((item) => item.id === conferenceId);
+    setSelectedId(conferenceId);
+
+    const firstDatedEvent = conference?.events
+      .filter((event) => event.date)
+      .sort(compareConferenceEvents)[0];
+
+    if (firstDatedEvent?.date) {
+      const eventDate = parseDate(firstDatedEvent.date);
+      setMonth(new Date(eventDate.getFullYear(), eventDate.getMonth(), 1));
+    }
+  }
+
   return (
     <main className="app-shell">
       <header className="topbar">
@@ -368,7 +400,7 @@ function App() {
             <button
               type="button"
               className="next-deadline"
-              onClick={() => setSelectedId(nextSubmission.conference.id)}
+              onClick={() => selectConference(nextSubmission.conference.id)}
             >
               <span>Next submission</span>
               <strong>{nextSubmission.conference.acronym}</strong>
@@ -376,6 +408,28 @@ function App() {
               <em>{compactDelta(nextSubmission.date, today)}</em>
             </button>
           )}
+
+          <section className="venue-panel">
+            <div className="filter-title">
+              <CalendarDays size={16} />
+              <span>Venues</span>
+            </div>
+            <div className="venue-list">
+              {conferences.map((conference) => (
+                <button
+                  key={conference.id}
+                  type="button"
+                  className={`venue-item domain-${conference.domain.toLowerCase()} ${
+                    selectedConference.id === conference.id ? "active" : ""
+                  }`}
+                  onClick={() => selectConference(conference.id)}
+                >
+                  <strong>{conference.acronym}</strong>
+                  <span>{primarySubmissionLabel(conference)}</span>
+                </button>
+              ))}
+            </div>
+          </section>
 
           <div className="filter-group">
             <div className="filter-title">
@@ -507,7 +561,7 @@ function App() {
                         type="button"
                         className={`event-chip kind-${event.kind} domain-${event.conference.domain.toLowerCase()}`}
                         title={`${event.conference.acronym}: ${event.label}`}
-                        onClick={() => setSelectedId(event.conference.id)}
+                        onClick={() => selectConference(event.conference.id)}
                       >
                         <span>{event.conference.acronym}</span>
                         <em>{kindLabels[event.kind]}</em>
@@ -533,7 +587,7 @@ function App() {
                   key={event.id}
                   type="button"
                   className={`agenda-item kind-${event.kind}`}
-                  onClick={() => setSelectedId(event.conference.id)}
+                  onClick={() => selectConference(event.conference.id)}
                 >
                   <time>{shortMonthFormatter.format(parseDate(event.date as string))}</time>
                   <div>
@@ -556,7 +610,7 @@ function App() {
                 <button
                   key={event.id}
                   type="button"
-                  onClick={() => setSelectedId(event.conference.id)}
+                  onClick={() => selectConference(event.conference.id)}
                 >
                   <strong>{event.conference.acronym}</strong>
                   <span>{event.label}</span>
@@ -565,6 +619,70 @@ function App() {
             </div>
           </section>
         </aside>
+      </section>
+
+      <section className="all-events-panel" aria-label="Matching deadlines">
+        <div className="panel-heading">
+          <h2>Matching Deadlines</h2>
+          <span>{filteredEvents.length}</span>
+        </div>
+        <div className="events-table-wrap">
+          <table className="events-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Venue</th>
+                <th>Type</th>
+                <th>Deadline</th>
+                <th>Status</th>
+                <th>Source</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredEvents.map((event) => (
+                <tr key={event.id}>
+                  <td>
+                    <button
+                      type="button"
+                      className="date-jump"
+                      onClick={() => selectConference(event.conference.id)}
+                    >
+                      {formatDate(event.date, event.endDate)}
+                    </button>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      className="venue-jump"
+                      onClick={() => selectConference(event.conference.id)}
+                    >
+                      {event.conference.acronym} {event.conference.year}
+                    </button>
+                  </td>
+                  <td>
+                    <span className={`type-badge kind-${event.kind}`}>
+                      {kindLabels[event.kind]}
+                    </span>
+                  </td>
+                  <td>
+                    <strong>{event.label}</strong>
+                    {event.notes && <span>{event.notes}</span>}
+                  </td>
+                  <td>
+                    <span className={`confidence ${event.confidence}`}>
+                      {confidenceLabels[event.confidence]}
+                    </span>
+                  </td>
+                  <td>
+                    <a href={event.sourceUrl} target="_blank" rel="noreferrer">
+                      <ExternalLink size={16} />
+                    </a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <section className="details-drawer" aria-label="Conference details">
