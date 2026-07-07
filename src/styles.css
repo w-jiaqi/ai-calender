@@ -324,7 +324,7 @@ a {
 
 .venue-item {
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr);
+  grid-template-columns: 92px minmax(0, 1fr);
   align-items: center;
   min-height: 42px;
   gap: 8px;

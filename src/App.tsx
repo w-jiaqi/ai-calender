@@ -424,7 +424,9 @@ function App() {
                   }`}
                   onClick={() => selectConference(conference.id)}
                 >
-                  <strong>{conference.acronym}</strong>
+                  <strong>
+                    {conference.acronym} {conference.year}
+                  </strong>
                   <span>{primarySubmissionLabel(conference)}</span>
                 </button>
               ))}

@@ -235,7 +235,7 @@ export const conferences: Conference[] = [
     sourceUrl: "https://iclr.cc/Conferences/2026/AuthorGuide",
     lastChecked: checked,
     notes:
-      "The call-for-papers page lists final decisions as Jan 25, while the author guide review process lists Jan 22. The app keeps Jan 22 as a conflict-tagged date because it is the more detailed author-guide schedule.",
+      "ICLR 2026 submission deadlines are in September 2025 because they precede the April 2026 conference. The call-for-papers page lists final decisions as Jan 25, while the author guide review process lists Jan 22. The app keeps Jan 22 as a conflict-tagged date because it is the more detailed author-guide schedule.",
     events: [
       {
         id: "iclr-2026-abstract",
