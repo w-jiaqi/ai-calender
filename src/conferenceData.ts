@@ -299,6 +299,52 @@ export const conferences: Conference[] = [
     ],
   },
   {
+    id: "iclr-2027",
+    acronym: "ICLR",
+    name: "International Conference on Learning Representations",
+    year: 2027,
+    domain: "ML",
+    location: "West Coast North America",
+    sourceUrl: "https://iclr.cc/Conferences/FutureMeetings",
+    lastChecked: checked,
+    notes:
+      "The official ICLR Future Meetings page lists ICLR 2027 as West Coast North America. The official 2027 Dates and Call for Papers pages are not published yet, so abstract and paper submission deadlines are marked TBD.",
+    events: [
+      {
+        id: "iclr-2027-abstract-tbd",
+        kind: "abstract",
+        label: "Abstract submission",
+        timezone: "AoE",
+        confidence: "tbd",
+        sourceUrl: "https://iclr.cc/Conferences/FutureMeetings",
+        emphasis: true,
+        notes:
+          "Official ICLR 2027 abstract deadline is not announced yet. The 2027 Dates and Call for Papers pages returned 404 when checked.",
+      },
+      {
+        id: "iclr-2027-paper-tbd",
+        kind: "paper",
+        label: "Full paper submission",
+        timezone: "AoE",
+        confidence: "tbd",
+        sourceUrl: "https://iclr.cc/Conferences/FutureMeetings",
+        emphasis: true,
+        notes:
+          "Official ICLR 2027 paper deadline is not announced yet. The 2027 Dates and Call for Papers pages returned 404 when checked.",
+      },
+      {
+        id: "iclr-2027-conference-tbd",
+        kind: "conference",
+        label: "Conference dates",
+        timezone: "local",
+        confidence: "tbd",
+        sourceUrl: "https://iclr.cc/Conferences/FutureMeetings",
+        notes:
+          "Official future-meetings page lists the region but not exact conference dates.",
+      },
+    ],
+  },
+  {
     id: "arr-2026",
     acronym: "ARR",
     name: "ACL Rolling Review",
